@@ -79,7 +79,7 @@ async function getForged(walletAddress) {
   window.web3 = new Web3(Web3.givenProvider);
   const result = await web3.eth.requestAccounts().catch();
 
-  const url = "/resources/forged.json";
+  const url = "./resources/forged.json";
   let allforged = [];
 
   const x = await fetch(url)
