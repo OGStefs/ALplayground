@@ -20,8 +20,8 @@ async function connect(e) {
             walletAddress.slice(0, 5) + "..." + walletAddress.slice(-4);
           btn.removeEventListener("click", (e) => connect(e));
         })
-        .then(() => getOwned(test))
-        .then(() => getForged(test))
+        .then(() => getOwned(walletAddress))
+        .then(() => getForged(walletAddress))
         .then(() => (window.location = "#venture"));
     } catch (error) {
       console.log(error);
@@ -102,7 +102,7 @@ async function getForged(walletAddress) {
   let a = web3.utils.toChecksumAddress(walletAddress);
   //   console.log("converted", a);
   //   console.log("forgies", x[a]);
-  console.log("the X", x);
+  //   console.log("the X", x);
   if (x) allforged = x[a]?.forged;
 
   console.log("Forged: " + String(allforged));
