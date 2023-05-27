@@ -1,3 +1,5 @@
+const apesClaimContract = "";
+
 /* To connect using MetaMask */
 async function connect(e) {
   const test = "0xBC4157EF7A9936797A9A8FE4c3Ff59FbDAA3Ee96";
@@ -18,8 +20,8 @@ async function connect(e) {
             walletAddress.slice(0, 5) + "..." + walletAddress.slice(-4);
           btn.removeEventListener("click", (e) => connect(e));
         })
-        .then(() => getOwned(walletAddress))
-        .then(() => getForged(walletAddress))
+        .then(() => getOwned(test))
+        .then(() => getForged(test))
         .then(() => (window.location = "#venture"));
     } catch (error) {
       console.log(error);
@@ -33,7 +35,6 @@ const btn = document.getElementById("connect-button");
 btn?.addEventListener("click", (e) => connect(e));
 
 const claimWalletBtn = document.getElementById("claim-wallet");
-//   ?.addEventListener("click", (e) => console.log(e));
 
 const claimForgedBtn = document.getElementById("claim-forge");
 //   ?.addEventListener("click", (e) => console.log(e));
@@ -63,6 +64,9 @@ async function getOwned(walletAddress) {
       );
       claimWalletBtn.textContent = "CLAIM";
       claimWalletBtn.classList.remove("empty");
+      claimWalletBtn.addEventListener("click", (e) =>
+        vpassMint(token_ids_lst, false)
+      );
     } else {
       claimWalletBtn.textContent = "nothing to claim";
     }
@@ -105,6 +109,9 @@ async function getForged(walletAddress) {
   if (allforged && allforged?.length > 0) {
     claimForgedBtn.textContent = "CLAIM";
     claimForgedBtn.classList.remove("empty");
+    claimForgedBtn.addEventListener("click", (e) =>
+      vpassMint(allforged, false)
+    );
   } else {
     claimForgedBtn.textContent = "nothing to claim";
   }
@@ -114,4 +121,72 @@ async function getForged(walletAddress) {
     " Forged Memberships";
 
   return allforged;
+}
+
+async function vpassMint(itemsToMint, claimingForged) {
+  var r = await Swal.fire({
+    title: "Memberships Owned",
+    html:
+      "<h2>You are minting " +
+      String(itemsToMint.length) +
+      " Memberships</h2>" +
+      "<h3>This will claim your Venture Pass. You will receive a new mint. Your original" +
+      " Membership will be claimed &amp; no longer claimable.</h3>" +
+      "<h2>You will pay gas mint each NFT.</h2>" +
+      "<h3>There will be a transition period before METL is loaded into your VPASS." +
+      "<h3>Are you sure?</h3>",
+    icon: "info",
+    confirmButtonText: "Ok!",
+    showDenyButton: true,
+  });
+
+  if (r.isDenied) {
+    return;
+  }
+
+  claimApes(itemsToMint, claimingForged);
+
+  console.log("Burn + Mint: " + String(itemsToMint));
+}
+
+async function claimApes(itemsToMint, areForged) {
+  web3 = new Web3(Web3.givenProvider);
+  var result = await web3.eth.requestAccounts().catch();
+  var myAddress = result[0];
+
+  var thisforge = new web3.eth.Contract(apesAbi, apesClaimContract);
+
+  try {
+    if (areForged) {
+      await thisforge.methods
+        .claimForgedApes(itemsToMint)
+        .send({ from: myAddress });
+    } else {
+      await thisforge.methods.claimApes(itemsToMint).send({ from: myAddress });
+    }
+  } catch (error) {
+    console.log("Error:", error);
+    await Swal.fire({
+      title: "Memberships NOT Claimed",
+      html:
+        "<h2>You FAILED to claim " +
+        String(itemsToMint.length) +
+        " Memberships</h2>",
+      icon: "error",
+      confirmButtonText: "Awww fck!",
+      showDenyButton: false,
+    });
+    return;
+  }
+
+  await Swal.fire({
+    title: "Memberships Claimed",
+    html:
+      "<h2>You have claimed " +
+      String(itemsToMint.length) +
+      " Memberships</h2>",
+    icon: "info",
+    confirmButtonText: "The Adventure Begins!",
+    showDenyButton: false,
+  });
 }
