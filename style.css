@@ -185,6 +185,10 @@ img {
   padding: 100px 0;
 }
 
+#services .service-top p {
+  padding: 0 10px;
+}
+
 #services .service-bottom {
   display: flex;
   align-items: center;
