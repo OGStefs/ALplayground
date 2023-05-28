@@ -125,7 +125,7 @@ async function getForged(walletAddress) {
 
 async function vpassMint(itemsToMint, claimingForged) {
   var r = await Swal.fire({
-    title: "Memberships Owned",
+    title: "<h1>Memberships Owned</h1>",
     html:
       "<h2>You are minting " +
       String(itemsToMint.length) +
