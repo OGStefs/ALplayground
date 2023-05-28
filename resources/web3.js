@@ -136,7 +136,8 @@ async function vpassMint(itemsToMint, claimingForged) {
       "<h3>There will be a transition period before METL is loaded into your VPASS." +
       "<h3>Are you sure?</h3>",
     icon: "info",
-    confirmButtonText: "Ok!",
+    confirmButtonText: "<h4>Ok!</h4>",
+    denyButtonText: "<h4>Nope</h4>",
     showDenyButton: true,
   });
 
@@ -173,7 +174,7 @@ async function claimApes(itemsToMint, areForged) {
         String(itemsToMint.length) +
         " Memberships</h2>",
       icon: "error",
-      confirmButtonText: "Awww fck!",
+      confirmButtonText: "<h4>Awww fck!</h4>",
       showDenyButton: false,
     });
     return;
@@ -186,7 +187,7 @@ async function claimApes(itemsToMint, areForged) {
       String(itemsToMint.length) +
       " Memberships</h2>",
     icon: "info",
-    confirmButtonText: "The Adventure Begins!",
+    confirmButtonText: "<h4>The Adventure Begins!</h4>",
     showDenyButton: false,
   });
 }
