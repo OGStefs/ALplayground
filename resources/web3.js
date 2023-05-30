@@ -1,10 +1,12 @@
-const apesClaimContract = "";
+// const apesClaimContract = ""; // MAIN NET
+const apesClaimContract = "0x9753090d04aC18d49e9c550dB1fe991b25379A30"; // TEST NET GOERLI
+//   const contractAddress = "0x61028F622CB6618cAC3DeB9ef0f0D5B9c6369C72"; // MAIN NET
+const contractAddress = "0xa2ec462e0Fa83b5A33e48399E0788c2640edf0cD"; // TEST NET GOERLI
 
 /* To connect using MetaMask */
 async function connect(e) {
-  const test = "0xBC4157EF7A9936797A9A8FE4c3Ff59FbDAA3Ee96";
   const button = e.target;
-  const contractAddress = "0x61028F622CB6618cAC3DeB9ef0f0D5B9c6369C72";
+
   let walletAddress;
   if (window.ethereum) {
     try {
@@ -43,7 +45,6 @@ async function getOwned(walletAddress) {
   console.log(walletAddress);
   window.web3 = new Web3(window.ethereum);
 
-  const contractAddress = "0x61028F622CB6618cAC3DeB9ef0f0D5B9c6369C72";
   const token_ids_lst = [];
 
   try {
