@@ -1,14 +1,12 @@
 {
   "0xa56918187F3Db7AaB93AEaD56845ad47E61a3005": {
-    "forged": [0, 1, 2, 3]
+    "forged": [0, 1, 2]
   },
 
-  "0x0028109B8B6Ca54E7e1c372CfC2a68B7e477cd43": {
-    "claimable": 142.4205695414493,
-    "claims": [1201, 1220, 1383, 1411, 1544, 1647],
-    "earned": 142.4205695414493,
-    "forged": [1201, 1220, 1383, 1411, 1544, 1647]
+  "0xac492b0fec41590ecb08b0edbbefa3319cfc7e1f": {
+    "forged": [12, 13]
   },
+
   "0x00C980F967b3E94e471C94d226Da998E1eb55A33": {
     "claimable": 0,
     "claims": [],

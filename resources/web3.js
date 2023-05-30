@@ -1,5 +1,5 @@
 // const apesClaimContract = ""; // MAIN NET
-const apesClaimContract = "0x9753090d04aC18d49e9c550dB1fe991b25379A30"; // TEST NET GOERLI
+const apesClaimContract = "0xdDDb55eFAb5f4F7510137f35Cd3dd62041A5E088"; // TEST NET GOERLI
 //   const contractAddress = "0x61028F622CB6618cAC3DeB9ef0f0D5B9c6369C72"; // MAIN NET
 const contractAddress = "0xa2ec462e0Fa83b5A33e48399E0788c2640edf0cD"; // TEST NET GOERLI
 
