@@ -66,7 +66,10 @@ async function getOwned(walletAddress) {
       claimWalletBtn.textContent = "CLAIM";
       claimWalletBtn.classList.remove("empty");
       claimWalletBtn.addEventListener("click", (e) =>
-        vpassMint(token_ids_lst, false)
+        vpassMint(
+          token_ids_lst.sort((a, b) => a - b),
+          false
+        )
       );
     } else {
       claimWalletBtn.textContent = "nothing to claim";
@@ -111,7 +114,10 @@ async function getForged(walletAddress) {
     claimForgedBtn.textContent = "CLAIM";
     claimForgedBtn.classList.remove("empty");
     claimForgedBtn.addEventListener("click", (e) =>
-      vpassMint(allforged, false)
+      vpassMint(
+        allforged.sort((a, b) => a - b),
+        false
+      )
     );
   } else {
     claimForgedBtn.textContent = "nothing to claim";
