@@ -10,11 +10,8 @@
   "0x8B86515bf2bDDAe91483a2F26d6F2cdb5f20F27d": {
     "forged": [19, 21, 23]
   },
-  "0x027C73dF1f9F1b846bb79c0D23C6c5a5798a747F": {
-    "claimable": 99.50334615165279,
-    "claims": [192, 194],
-    "earned": 99.50334615165279,
-    "forged": [192, 194]
+  "0x867eb0804eaca9feeda8a0e1d2b9a32eef58af8f": {
+    "forged": [24, 25]
   },
   "0x033EC75DC32F5afD7D5b47eCA710B864b95E1a3C": {
     "claimable": 0,
@@ -920,12 +917,7 @@
     "earned": 62.4096383418533,
     "forged": [336, 1181]
   },
-  "0x867Eb0804eACA9FEeda8a0E1d2B9a32eEF58AF8f": {
-    "claimable": 61.28401673957077,
-    "claims": [633],
-    "earned": 61.28401673957077,
-    "forged": [633]
-  },
+
   "0x86C71EBB222834E01187D23c331be228E01c77e9": {
     "claimable": 0,
     "claims": [],
@@ -1129,12 +1121,7 @@
     "earned": 135.7278484573,
     "forged": [214, 312, 448, 742, 760, 1020, 1222, 1401, 1545]
   },
-  "0xAc492b0FeC41590ecB08B0EDBBEfA3319CFc7e1F": {
-    "claimable": 78.73127017629056,
-    "claims": [158, 983],
-    "earned": 78.73127017629056,
-    "forged": [158, 983]
-  },
+
   "0xB36Ac67Fc5903f0b7317ba63DB2141De591175C0": {
     "claimable": 141.24281078988926,
     "claims": [344, 889, 1457, 1499],
