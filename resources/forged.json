@@ -7,11 +7,8 @@
     "forged": [12, 13]
   },
 
-  "0x00C980F967b3E94e471C94d226Da998E1eb55A33": {
-    "claimable": 0,
-    "claims": [],
-    "earned": 41.55790970622082,
-    "forged": [359, 672, 1038, 1536]
+  "0x8B86515bf2bDDAe91483a2F26d6F2cdb5f20F27d": {
+    "forged": [19, 21, 23]
   },
   "0x027C73dF1f9F1b846bb79c0D23C6c5a5798a747F": {
     "claimable": 99.50334615165279,

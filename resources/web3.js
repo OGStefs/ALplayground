@@ -39,7 +39,6 @@ btn?.addEventListener("click", (e) => connect(e));
 const claimWalletBtn = document.getElementById("claim-wallet");
 
 const claimForgedBtn = document.getElementById("claim-forge");
-//   ?.addEventListener("click", (e) => console.log(e));
 
 async function getOwned(walletAddress) {
   console.log(walletAddress);
