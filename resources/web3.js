@@ -137,7 +137,7 @@ async function getForged(walletAddress) {
 
   let a = web3.utils.toChecksumAddress(walletAddress);
   if (x) allforged = x[a]?.forged;
-  for (let i = 0; i < allforged.length; i++) {
+  for (let i = 0; i < allforged?.length; i++) {
     const isClaimed = await vpassContract.methods
       .apeClaimed(allforged[i])
       .call()
