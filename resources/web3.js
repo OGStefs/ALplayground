@@ -18,13 +18,13 @@ let account;
 /* To connect using MetaMask */
 async function connect(e) {
   const button = e.target;
-
+  btn.classList.add("button--loading");
+  button.textContent = "loading...";
   if (window.ethereum) {
     try {
       const accounts = await ethereum.request({ method: "eth_accounts" });
       if (accounts?.length > 0) {
         account = accounts[0];
-        button.textContent = account.slice(0, 5) + "..." + account.slice(-4);
         btn.removeEventListener("click", (e) => connect(e));
 
         window.web3 = new Web3(window.ethereum);
@@ -36,6 +36,8 @@ async function connect(e) {
 
         await getOwned(account);
         await getForged(account);
+        btn.classList.remove("button--loading");
+        button.textContent = account.slice(0, 5) + "..." + account.slice(-4);
         window.location = "#venture";
       }
     } catch (error) {
@@ -49,7 +51,7 @@ async function connect(e) {
 // get items in wallet and check if claimed already
 async function getOwned(walletAddress) {
   // window.web3 = new Web3(window.ethereum);
-
+  claimWalletBtn.classList.add("button--loading");
   const token_ids_lst = [];
   const claimedTokens = [];
 
@@ -67,10 +69,11 @@ async function getOwned(walletAddress) {
           .catch((err) => console.log(err.message));
         // check if tokens are claimed already:
         const isClaimed = await vpassContract.methods
-          .ownerOf(id)
+          .apeClaimed(id)
           .call()
           .catch((err) => console.log(err.message));
-        if (!isClaimed) {
+        // console.log(isClaimed);
+        if (isClaimed === "0") {
           token_ids_lst.push(+Number(id));
         } else {
           claimedTokens.push(+Number(id));
@@ -88,9 +91,11 @@ async function getOwned(walletAddress) {
         );
       } else {
         claimWalletBtn.textContent = "nothing to claim";
+        claimWalletBtn.classList.add("empty");
       }
     } else {
       claimWalletBtn.textContent = "nothing to claim";
+      claimWalletBtn.classList.add("empty");
     }
     console.log("Owned: " + String(token_ids_lst));
   } catch (error) {
@@ -103,14 +108,15 @@ async function getOwned(walletAddress) {
   document.getElementById("wallet-text").textContent =
     "You can claim " + String(token_ids_lst.length) + " Membership(s)";
 
+  claimWalletBtn.classList.remove("button--loading");
+
   return token_ids_lst;
 }
 
 // ___________________________________
 // get forged items and spread the data
 async function getForged(walletAddress) {
-  // window.web3 = new Web3(Web3.givenProvider);
-  // const result = await web3.eth.requestAccounts().catch();
+  claimForgedBtn.classList.add("button--loading");
 
   const url = "./resources/forged.json";
   let allforged = [];
@@ -133,11 +139,11 @@ async function getForged(walletAddress) {
   if (x) allforged = x[a]?.forged;
   for (let i = 0; i < allforged.length; i++) {
     const isClaimed = await vpassContract.methods
-      .ownerOf(allforged[i])
+      .apeClaimed(allforged[i])
       .call()
       .catch((err) => console.log(err.message));
-    console.log(allforged[i], isClaimed);
-    if (!isClaimed) {
+    // console.log(allforged[i], isClaimed);
+    if (isClaimed === "0") {
       claimable.push(allforged[i]);
     } else {
       claimedTokens.push(allforged[i]);
@@ -165,11 +171,18 @@ async function getForged(walletAddress) {
     "You can claim " +
     String(claimable ? claimable.length : 0) +
     " Forged Memberships";
+  claimForgedBtn.classList.remove("button--loading");
 
   return claimable;
 }
 
 async function vpassMint(itemsToMint, claimingForged) {
+  if (claimingForged) {
+    claimForgedBtn.classList.add("button--loading");
+  } else {
+    claimWalletBtn.classList.add("button--loading");
+  }
+
   var r = await Swal.fire({
     title: "<h1>Memberships Owned</h1>",
     html:
@@ -202,10 +215,14 @@ async function claimApes(itemsToMint, areForged) {
       await vpassContract.methods
         .claimForgedApes(itemsToMint)
         .send({ from: account });
+      await getForged(account);
+      claimForgedBtn.classList.remove("button--loading");
     } else {
       await vpassContract.methods
         .claimApes(itemsToMint)
         .send({ from: account });
+      await getOwned(account);
+      claimWalletBtn.classList.remove("button--loading");
     }
   } catch (error) {
     console.log("Error:", error);
