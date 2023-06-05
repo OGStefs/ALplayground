@@ -3,28 +3,41 @@ const apesClaimContract = "0xC1b774CbD2966B37652A1BcB316862E8623D4068"; // TEST 
 //   const contractAddress = "0x61028F622CB6618cAC3DeB9ef0f0D5B9c6369C72"; // MAIN NET
 const contractAddress = "0xa2ec462e0Fa83b5A33e48399E0788c2640edf0cD"; // TEST NET GOERLI
 
+// get buttons
+const btn = document.getElementById("connect-button");
+btn?.addEventListener("click", (e) => {
+  connect(e);
+});
+const claimWalletBtn = document.getElementById("claim-wallet");
+const claimForgedBtn = document.getElementById("claim-forge");
+
+let vpassContract;
+let forgeContract;
+let account;
+
 /* To connect using MetaMask */
 async function connect(e) {
   const button = e.target;
 
-  let walletAddress;
   if (window.ethereum) {
     try {
-      await window.ethereum
-        .request({ method: "eth_requestAccounts" })
-        .then(() => {
-          window.web3 = new Web3(window.ethereum);
-          const account = web3.eth.accounts;
-          //Get the current MetaMask selected/active wallet
-          walletAddress = account.givenProvider.selectedAddress;
-          console.log(`Wallet: ${walletAddress}`);
-          button.textContent =
-            walletAddress.slice(0, 5) + "..." + walletAddress.slice(-4);
-          btn.removeEventListener("click", (e) => connect(e));
-        })
-        .then(() => getOwned(walletAddress))
-        .then(() => getForged(walletAddress))
-        .then(() => (window.location = "#venture"));
+      const accounts = await ethereum.request({ method: "eth_accounts" });
+      if (accounts?.length > 0) {
+        account = accounts[0];
+        button.textContent = account.slice(0, 5) + "..." + account.slice(-4);
+        btn.removeEventListener("click", (e) => connect(e));
+
+        window.web3 = new Web3(window.ethereum);
+        forgeContract = new window.web3.eth.Contract(
+          membershipAbi,
+          contractAddress
+        );
+        vpassContract = new web3.eth.Contract(apesAbi, apesClaimContract);
+
+        await getOwned(account);
+        await getForged(account);
+        window.location = "#venture";
+      }
     } catch (error) {
       console.log(error);
     }
@@ -33,43 +46,49 @@ async function connect(e) {
   }
 }
 
-const btn = document.getElementById("connect-button");
-btn?.addEventListener("click", (e) => connect(e));
-
-const claimWalletBtn = document.getElementById("claim-wallet");
-
-const claimForgedBtn = document.getElementById("claim-forge");
-
+// get items in wallet and check if claimed already
 async function getOwned(walletAddress) {
-  console.log(walletAddress);
-  window.web3 = new Web3(window.ethereum);
+  // window.web3 = new Web3(window.ethereum);
 
   const token_ids_lst = [];
+  const claimedTokens = [];
 
   try {
-    // Update to your address
-    contract = new window.web3.eth.Contract(membershipAbi, contractAddress);
-    const bal = await contract.methods.balanceOf(walletAddress).call();
-    console.log(bal);
+    // get forged memberships
+    const bal = await forgeContract.methods
+      .balanceOf(walletAddress)
+      .call()
+      .catch();
     if (bal > 0) {
-      const promises = [...Array(Number(bal))];
-
-      await Promise.all(
-        promises.map(async (_, i) => {
-          const id = await contract.methods
-            .tokenOfOwnerByIndex(walletAddress, i)
-            .call();
+      for (let i = 0; i < bal; i++) {
+        const id = await forgeContract.methods
+          .tokenOfOwnerByIndex(walletAddress, i)
+          .call()
+          .catch((err) => console.log(err.message));
+        // check if tokens are claimed already:
+        const isClaimed = await vpassContract.methods
+          .ownerOf(id)
+          .call()
+          .catch((err) => console.log(err.message));
+        if (!isClaimed) {
           token_ids_lst.push(+Number(id));
-        })
-      );
-      claimWalletBtn.textContent = "CLAIM";
-      claimWalletBtn.classList.remove("empty");
-      claimWalletBtn.addEventListener("click", (e) =>
-        vpassMint(
-          token_ids_lst.sort((a, b) => a - b),
-          false
-        )
-      );
+        } else {
+          claimedTokens.push(+Number(id));
+        }
+      }
+
+      if (token_ids_lst?.length > 0) {
+        claimWalletBtn.textContent = "CLAIM";
+        claimWalletBtn.classList.remove("empty");
+        claimWalletBtn.addEventListener("click", (e) =>
+          vpassMint(
+            token_ids_lst.sort((a, b) => a - b),
+            false
+          )
+        );
+      } else {
+        claimWalletBtn.textContent = "nothing to claim";
+      }
     } else {
       claimWalletBtn.textContent = "nothing to claim";
     }
@@ -78,17 +97,25 @@ async function getOwned(walletAddress) {
     console.log("error: " + error);
   }
 
+  document.getElementById("wallet-text-underline").textContent =
+    String(claimedTokens.length) + " Membership(s) are already claimed";
+
   document.getElementById("wallet-text").textContent =
-    "You own " + String(token_ids_lst.length) + " Memberships";
+    "You can claim " + String(token_ids_lst.length) + " Membership(s)";
+
   return token_ids_lst;
 }
 
+// ___________________________________
+// get forged items and spread the data
 async function getForged(walletAddress) {
-  window.web3 = new Web3(Web3.givenProvider);
-  const result = await web3.eth.requestAccounts().catch();
+  // window.web3 = new Web3(Web3.givenProvider);
+  // const result = await web3.eth.requestAccounts().catch();
 
   const url = "./resources/forged.json";
   let allforged = [];
+  let claimable = [];
+  let claimedTokens = [];
 
   const x = await fetch(url)
     .then((res) => res.json())
@@ -104,26 +131,42 @@ async function getForged(walletAddress) {
 
   let a = web3.utils.toChecksumAddress(walletAddress);
   if (x) allforged = x[a]?.forged;
+  for (let i = 0; i < allforged.length; i++) {
+    const isClaimed = await vpassContract.methods
+      .ownerOf(allforged[i])
+      .call()
+      .catch((err) => console.log(err.message));
+    console.log(allforged[i], isClaimed);
+    if (!isClaimed) {
+      claimable.push(allforged[i]);
+    } else {
+      claimedTokens.push(allforged[i]);
+    }
+  }
 
-  console.log("Forged: " + String(allforged));
-  if (allforged && allforged?.length > 0) {
+  console.log("Forged: " + String(claimable));
+  if (claimable?.length > 0) {
     claimForgedBtn.textContent = "CLAIM";
     claimForgedBtn.classList.remove("empty");
     claimForgedBtn.addEventListener("click", (e) =>
       vpassMint(
-        allforged.sort((a, b) => a - b),
+        claimable.sort((a, b) => a - b),
         true
       )
     );
   } else {
     claimForgedBtn.textContent = "nothing to claim";
   }
+
+  document.getElementById("forge-text-underline").textContent =
+    String(claimedTokens.length) + " Membership(s) are already claimed";
+
   document.getElementById("forge-text").textContent =
-    "You have " +
-    String(allforged ? allforged.length : 0) +
+    "You can claim " +
+    String(claimable ? claimable.length : 0) +
     " Forged Memberships";
 
-  return allforged;
+  return claimable;
 }
 
 async function vpassMint(itemsToMint, claimingForged) {
@@ -154,19 +197,15 @@ async function vpassMint(itemsToMint, claimingForged) {
 }
 
 async function claimApes(itemsToMint, areForged) {
-  web3 = new Web3(Web3.givenProvider);
-  var result = await web3.eth.requestAccounts().catch();
-  var myAddress = result[0];
-
-  var thisforge = new web3.eth.Contract(apesAbi, apesClaimContract);
-
   try {
     if (areForged) {
-      await thisforge.methods
+      await vpassContract.methods
         .claimForgedApes(itemsToMint)
-        .send({ from: myAddress });
+        .send({ from: account });
     } else {
-      await thisforge.methods.claimApes(itemsToMint).send({ from: myAddress });
+      await vpassContract.methods
+        .claimApes(itemsToMint)
+        .send({ from: account });
     }
   } catch (error) {
     console.log("Error:", error);
