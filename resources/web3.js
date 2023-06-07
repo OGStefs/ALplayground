@@ -22,7 +22,9 @@ async function connect(e) {
   button.textContent = "loading...";
   if (window.ethereum) {
     try {
-      const accounts = await ethereum.request({ method: "eth_accounts" });
+      const accounts = await ethereum.request({
+        method: "eth_requestAccounts",
+      });
       if (accounts?.length > 0) {
         account = accounts[0];
         btn.removeEventListener("click", (e) => connect(e));
