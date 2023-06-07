@@ -10,6 +10,7 @@ btn?.addEventListener("click", (e) => {
 });
 const claimWalletBtn = document.getElementById("claim-wallet");
 const claimForgedBtn = document.getElementById("claim-forge");
+const claimCheckBtn = document.getElementById("check-claimed");
 
 let vpassContract;
 let forgeContract;
@@ -21,6 +22,13 @@ async function connect(e) {
   btn.classList.add("button--loading");
   button.textContent = "loading...";
   if (window.ethereum) {
+    // activate claim check button
+    claimCheckBtn.classList.remove("empty");
+    claimCheckBtn.textContent = "check";
+    claimCheckBtn?.addEventListener("click", (e) => {
+      claimCheck(e);
+    });
+
     try {
       const accounts = await ethereum.request({
         method: "eth_requestAccounts",
@@ -218,16 +226,16 @@ async function claimApes(itemsToMint, areForged) {
         .claimForgedApes(itemsToMint)
         .send({ from: account });
       await getForged(account);
-      claimForgedBtn.classList.remove("button--loading");
     } else {
       await vpassContract.methods
         .claimApes(itemsToMint)
         .send({ from: account });
       await getOwned(account);
-      claimWalletBtn.classList.remove("button--loading");
     }
   } catch (error) {
     console.log("Error:", error);
+    claimForgedBtn.classList.remove("button--loading");
+    claimWalletBtn.classList.remove("button--loading");
     await Swal.fire({
       title: "Memberships NOT Claimed",
       html:
@@ -240,6 +248,8 @@ async function claimApes(itemsToMint, areForged) {
     });
     return;
   }
+  claimForgedBtn.classList.remove("button--loading");
+  claimWalletBtn.classList.remove("button--loading");
 
   await Swal.fire({
     title: "Memberships Claimed",
@@ -252,3 +262,35 @@ async function claimApes(itemsToMint, areForged) {
     showDenyButton: false,
   });
 }
+
+const claimCheck = async (e) => {
+  e.preventDefault();
+  const membership = document.getElementById("membership")?.value;
+  try {
+    const isClaimed = await vpassContract.methods
+      .apeClaimed(parseInt(membership))
+      .call()
+      .catch((err) => console.log(err.message));
+
+    console.log(isClaimed);
+    const claimed = isClaimed === "0" ? "<h5>not</h5>" : "<h6>already</h6>";
+
+    await Swal.fire({
+      title: "Check Check",
+      html:
+        "<h2>Membership " +
+        membership +
+        "</h2>" +
+        "<h1>Has</h1>" +
+        "<h5>" +
+        claimed +
+        "</h5>" +
+        "<h1> been claimed.</h1>",
+      icon: "info",
+      confirmButtonText: "<h4>Thanks!</h4>",
+      showDenyButton: false,
+    });
+  } catch (error) {
+    console.log(error.message);
+  }
+};

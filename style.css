@@ -53,6 +53,18 @@ h4 {
   font-size: 2rem;
 }
 
+h5 {
+  font-size: 2.4rem;
+  font-weight: 600;
+  color: lightgreen;
+}
+
+h6 {
+  font-size: 2.4rem;
+  font-weight: 600;
+  color: var(--main-color);
+}
+
 img {
   height: 100%;
   width: 100%;
@@ -281,6 +293,23 @@ img {
   background-color: rgba(200, 200, 200, 0.4);
   border: 2px solid rgba(200, 200, 200, 0.4);
   color: rgba(200, 200, 200, 0.8);
+}
+
+#services #claim-form {
+  font-size: 1.4rem;
+  line-height: 2.5rem;
+  font-weight: 300;
+  letter-spacing: 0.05rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+  color: white;
+}
+
+#services #claim-form input {
+  font-size: 2rem;
 }
 
 /* End of Service Section */
